@@ -7,14 +7,16 @@ module.exports = {
     colors: {
       primary: '#4E4376',
       secondary: '#D9D9D9',
-      white: '#FFFFFF'
+      white: '#FFFFFF',
+      transparent: 'transparent'
     },
     container: {
       screens: {
         sm: '640px',
         md: '768px',
         lg: '1024px',
-        xl: '1280px'
+        xl: '1280px',
+        '2xl': '1736px'
       }
     },
     extend: {}
