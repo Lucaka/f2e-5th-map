@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import Logo from './iconList/Logo.svg'
 
 const icons = {
-
+  Logo
 }
 
 type IconType = keyof typeof icons
