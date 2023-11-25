@@ -1,0 +1,10 @@
+{
+    "i18n-ally.localesPaths": [
+        "src/plugin/i18n"
+    ],
+    "css.customData": [
+        // ".vscode/tailwind.json"
+    ],
+    "i18n-ally.keystyle": "nested",
+    // "i18n-ally.keystyle": "nested",
+}
