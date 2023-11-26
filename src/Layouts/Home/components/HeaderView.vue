@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useCounterStore } from '@/stores/president'
+import { usePresidentStore } from '@/stores/president'
 import { storeToRefs } from 'pinia'
 
-const { presidentYear } = storeToRefs(useCounterStore())
-const { setPresidentYear } = useCounterStore()
+const { presidentYear } = storeToRefs(usePresidentStore())
+const { setPresidentYear } = usePresidentStore()
 
 const presidentialDate = computed(() => [
   {
