@@ -1,7 +1,7 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 
-export const useCounterStore = defineStore('president', () => {
+export const usePresidentStore = defineStore('president', () => {
   const presidentYear = ref(2020)
 
   function setPresidentYear(value: number) {
