@@ -32,6 +32,25 @@ export const useOverviewStore = defineStore('overview', () => {
     { immediate: true }
   )
 
+  const currentYearVoteData = computed(() => {
+    const data = presidentData[presidentYear.value]
+    if (!data) return []
+
+    const candidates = data[1] || []
+
+    const candidatesKeys = Object.keys(candidates)
+    const candidatesLength = candidatesKeys.length
+
+    const list = data.slice(candidatesLength + 2).map((item) => ({
+      ...item,
+      Column2: countHandler(item['Column2']),
+      Column3: countHandler(item['Column3']),
+      Column4: countHandler(item['Column4']),
+    }))
+
+    return list
+  })
+
   const currentYearPresidentData = computed(() => {
     const data = presidentData[presidentYear.value]
     if (!data) return []
@@ -41,29 +60,31 @@ export const useOverviewStore = defineStore('overview', () => {
     const candidatesKeys = Object.keys(candidates)
     const candidatesLength = candidatesKeys.length
 
-    const list = data.slice(candidatesLength + 2).reduce<CurrentYearPresidentData[]>((acc, item) => {
-      if (!item) return acc
+    const list = data
+      .slice(candidatesLength + 2)
+      .reduce<CurrentYearPresidentData[]>((acc, item) => {
+        if (!item) return acc
 
-      if (!acc.length) {
-        acc.length = candidatesKeys.length
+        if (!acc.length) {
+          acc.length = candidatesKeys.length
+
+          candidatesKeys.forEach((key, index) => {
+            acc[index] = {
+              name: candidates[key as keyof typeof candidates],
+              data: []
+            }
+          })
+        }
 
         candidatesKeys.forEach((key, index) => {
-          acc[index] = {
-            name: candidates[key as keyof typeof candidates],
-            data: []
-          }
+          acc[index].data.push({
+            county: item['Column1'] || '-',
+            count: countHandler(item[key as keyof typeof item]) || NaN
+          })
         })
-      }
 
-      candidatesKeys.forEach((key, index) => {
-        acc[index].data.push({
-          county: item['Column1'] || '-',
-          count: countHandler(item[key as keyof typeof item]) || NaN
-        })
-      })
-
-      return acc
-    }, [])
+        return acc
+      }, [])
 
     return list
   })
@@ -102,5 +123,5 @@ export const useOverviewStore = defineStore('overview', () => {
     return Number(count.replace(/,/g, ''))
   }
 
-  return { presidentData, currentYearPresidentData, currentYearTotal }
+  return { presidentData, currentYearVoteData, currentYearPresidentData, currentYearTotal }
 })
