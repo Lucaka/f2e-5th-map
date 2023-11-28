@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import { useOverviewStore } from '@/stores/overview'
+import { useCountyStore } from '@/stores/county'
 import { ref, computed } from 'vue'
 import UtilIcon from '@/components/utils/icon/UtilIcon.vue'
 import OverviewPies from '@/views/Home/components/OverviewPies.vue'
 import OverviewBar from '@/views/Home/components/OverviewBar.vue'
 import OverviewMap from '@/views/Home/components/OverviewMap.vue'
-
-const search = ref<null | string>(null)
+import { storeToRefs } from 'pinia'
 
 const useOverview = useOverviewStore()
+const { currentCounty } = storeToRefs(useCountyStore())
+
 const colors = ['#B4A073', '#08C0BE', '#E756B8']
 const presidentData = computed(() => {
   return useOverview.currentYearPresidentData
@@ -70,12 +72,12 @@ function numberFormat(value: number) {
     <div class="grid grid-cols-12 gap-4 lg:gap-10 mt-12 mb-14">
       <button
         class="tools col-span-4 lg:col-span-2"
-        :class="{ active: search === null }"
-        @click="search = null"
+        :class="{ active: currentCounty === null }"
+        @click="currentCounty = null"
       >
         全國
       </button>
-      <select v-model="search" class="tools col-span-4 lg:col-span-2">
+      <select v-model="currentCounty" class="tools col-span-4 lg:col-span-2">
         <option :value="null">縣市</option>
         <option value="高雄市">高雄市</option>
       </select>
@@ -133,7 +135,7 @@ function numberFormat(value: number) {
 
         <div>
           <p class="text-2xl text-white mb-8">各縣市政黨得票數</p>
-          <OverviewBar class="overflow-auto" />
+          <OverviewBar class="overflow-auto mb-10" />
         </div>
       </div>
 

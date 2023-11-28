@@ -1,4 +1,4 @@
-import { computed, reactive, watch } from 'vue'
+import { computed, reactive, ref, watch } from 'vue'
 import { defineStore, storeToRefs } from 'pinia'
 import { usePresidentStore } from './president'
 
@@ -13,18 +13,40 @@ export const useCountyStore = defineStore('county', () => {
   const { presidentYear } = storeToRefs(usePresidentStore())
 
   const countyData = reactive<PresidentData>({})
+  const currentCounty = ref<string | null>(null)
 
-  async function getCountyData(county: string) {
+  watch(
+    [presidentYear, currentCounty],
+    async (newVal) => {
+      getCountyData(newVal[1])
+    },
+    { immediate: true }
+  )
+
+  function setCounty(county: string | null) {
+    currentCounty.value = county
+  }
+
+  async function getCountyData(county: string | null) {
+    if (!county) return (currentCounty.value = null)
+
     const data = countyData[presidentYear + county]
 
     if (!data) {
-      const json = await import(`@/utils/data/${presidentYear}/${county}.json`)
-      Object.assign(countyData, { [presidentYear + county]: json.default })
+      const json = await import(`@/utils/data/${presidentYear.value}/${county}.json`)
+      Object.assign(countyData, { [presidentYear.value + county]: json.default })
+
+      currentCounty.value = county
       return json.default
     }
 
     return data
   }
 
-  return { countyData, getCountyData }
+  const getCurrentCountyData = computed(() => {
+    if (!currentCounty.value) return null
+    return countyData[presidentYear.value + currentCounty.value]
+  })
+
+  return { countyData, currentCounty, setCounty, getCountyData, getCurrentCountyData }
 })

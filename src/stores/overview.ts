@@ -1,6 +1,7 @@
 import { computed, reactive, watch } from 'vue'
 import { defineStore, storeToRefs } from 'pinia'
 import { usePresidentStore } from './president'
+import { useCountyStore } from './county'
 
 import typeJson from '@/utils/data/2020/central.json'
 
@@ -20,6 +21,8 @@ interface CurrentYearPresidentData {
 
 export const useOverviewStore = defineStore('overview', () => {
   const { presidentYear } = storeToRefs(usePresidentStore())
+  const { currentCounty, getCurrentCountyData } = storeToRefs(useCountyStore())
+
   const presidentData = reactive<PresidentData>({})
 
   watch(
@@ -32,8 +35,12 @@ export const useOverviewStore = defineStore('overview', () => {
     { immediate: true }
   )
 
+  const currentPresidentData = computed(() => {
+    return currentCounty.value ? getCurrentCountyData.value : presidentData[presidentYear.value]
+  })
+
   const currentYearVoteData = computed(() => {
-    const data = presidentData[presidentYear.value]
+    const data = currentPresidentData.value
     if (!data) return []
 
     const candidates = data[1] || []
@@ -45,14 +52,14 @@ export const useOverviewStore = defineStore('overview', () => {
       ...item,
       Column2: countHandler(item['Column2']),
       Column3: countHandler(item['Column3']),
-      Column4: countHandler(item['Column4']),
+      Column4: countHandler(item['Column4'])
     }))
 
     return list
   })
 
   const currentYearPresidentData = computed(() => {
-    const data = presidentData[presidentYear.value]
+    const data = currentPresidentData.value
     if (!data) return []
 
     const candidates = data[1] || []
@@ -90,7 +97,7 @@ export const useOverviewStore = defineStore('overview', () => {
   })
 
   const currentYearTotal = computed(() => {
-    const data = presidentData[presidentYear.value]
+    const data = currentPresidentData.value
     const defaultData = {
       voteRate: 0,
       sendCount: 0,
