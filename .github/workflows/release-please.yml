@@ -46,7 +46,7 @@ jobs:
       # Build project
       - name: Build project
         if: ${{ steps.release.outputs.release_created }}
-        run: pnpm build
+        run: pnpm build-only
       
       # Create zip archive
       - name: Create zip archive
