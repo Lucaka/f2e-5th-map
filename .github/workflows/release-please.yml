@@ -1,0 +1,63 @@
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+
+name: release-please
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: google-github-actions/release-please-action@v4
+        id: release
+        with:
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          release-type: node
+      
+      # Checkout code when a release is created
+      - uses: actions/checkout@v4
+        if: ${{ steps.release.outputs.release_created }}
+      
+      # Setup Node.js environment
+      - name: Setup Node.js
+        if: ${{ steps.release.outputs.release_created }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: '19.8.1'
+      
+      # Install pnpm
+      - name: Install pnpm
+        if: ${{ steps.release.outputs.release_created }}
+        uses: pnpm/action-setup@v3
+        with:
+          version: '8.10.2'
+          run_install: false
+      
+      # Install dependencies
+      - name: Install dependencies
+        if: ${{ steps.release.outputs.release_created }}
+        run: pnpm install
+      
+      # Build project
+      - name: Build project
+        if: ${{ steps.release.outputs.release_created }}
+        run: pnpm build
+      
+      # Create zip archive
+      - name: Create zip archive
+        if: ${{ steps.release.outputs.release_created }}
+        run: |
+          apt-get update && apt-get install -y zip
+          zip -r dist.zip dist/
+      
+      # Upload Release Artifact
+      - name: Upload Release Artifact
+        if: ${{ steps.release.outputs.release_created }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload ${{ steps.release.outputs.tag_name }} ./dist.zip
